@@ -1,4 +1,4 @@
-module infomodel-service
+module github.com/iddqdeika/infomodel-service
 
 go 1.13
 
