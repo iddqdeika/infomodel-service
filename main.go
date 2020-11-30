@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/iddqdeika/infomodel-service/root"
 	"github.com/iddqdeika/rrr"
-	"infomodel-service/root"
 )
 
 func main() {

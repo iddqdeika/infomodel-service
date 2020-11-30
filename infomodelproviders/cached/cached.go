@@ -2,8 +2,8 @@ package cached
 
 import (
 	"fmt"
+	"github.com/iddqdeika/infomodel-service/definitions"
 	"github.com/iddqdeika/pim"
-	"infomodel-service/definitions"
 	"log"
 	"sync"
 	"time"

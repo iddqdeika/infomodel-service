@@ -3,11 +3,11 @@ package web
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/iddqdeika/infomodel-service/definitions"
 	"github.com/iddqdeika/pim"
-	"infomodel-service/definitions"
-	"infomodel-service/nethelper"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 const (
@@ -44,14 +44,14 @@ type webService struct {
 
 func (ws *webService) Run() error {
 	log.Println("http handler init")
-	addr, err := nethelper.GetCurrentAddr(ws.cfg.Port)
-	if err != nil {
-		return err
-	}
+	//addr, err := nethelper.GetCurrentAddr(ws.cfg.Port)
+	//if err != nil {
+	//	return err
+	//}
 	http.HandleFunc(getInfomodelByIdentifierPath, ws.getInfomodelByIdentifier)
 
-	log.Println("http handler started on addr: " + addr)
-	return http.ListenAndServe(addr, nil)
+	log.Println("http handler started on port: " + strconv.Itoa(ws.cfg.Port))
+	return http.ListenAndServe(":"+strconv.Itoa(ws.cfg.Port), nil)
 }
 
 func (ws *webService) getInfomodelByIdentifier(w http.ResponseWriter, req *http.Request) {

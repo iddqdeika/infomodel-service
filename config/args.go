@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"infomodel-service/definitions"
+	"github.com/iddqdeika/infomodel-service/definitions"
 	"os"
 	"reflect"
 	"strconv"

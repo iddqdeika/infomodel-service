@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"infomodel-service/definitions"
+	"github.com/iddqdeika/infomodel-service/definitions"
 	"strings"
 )
 

@@ -2,12 +2,12 @@ package root
 
 import (
 	"context"
+	"github.com/iddqdeika/infomodel-service/config"
+	"github.com/iddqdeika/infomodel-service/definitions"
+	"github.com/iddqdeika/infomodel-service/infomodelproviders/cached"
+	"github.com/iddqdeika/infomodel-service/infomodelproviders/pim"
+	"github.com/iddqdeika/infomodel-service/web"
 	"github.com/iddqdeika/rrr"
-	"infomodel-service/config"
-	"infomodel-service/definitions"
-	"infomodel-service/infomodelproviders/cached"
-	"infomodel-service/infomodelproviders/pim"
-	"infomodel-service/web"
 )
 
 func New() rrr.Root {
