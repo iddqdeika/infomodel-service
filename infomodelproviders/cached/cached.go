@@ -31,14 +31,18 @@ type cachedInfomodelProvider struct {
 }
 
 func (c *cachedInfomodelProvider) GetByIdentifier(identifier string) (*pim.StructureGroup, error) {
+	c.m.RLock()
 	cr, ok := c.records[identifier]
+	c.m.RUnlock()
 	if !ok {
 		err := c.createNewCachedRecord(identifier)
 		if err != nil {
 			return nil, err
 		}
 	}
+	c.m.RLock()
 	cr, ok = c.records[identifier]
+	c.m.RUnlock()
 	if !ok {
 		return nil, fmt.Errorf("internal error: cant find cache record")
 	}
@@ -54,7 +58,6 @@ func (c *cachedInfomodelProvider) GetByIdentifier(identifier string) (*pim.Struc
 	cr.m.RLock()
 	defer cr.m.RUnlock()
 	return cr.im, nil
-
 }
 
 func (c *cachedInfomodelProvider) createNewCachedRecord(identifier string) error {
