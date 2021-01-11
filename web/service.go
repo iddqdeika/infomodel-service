@@ -2,12 +2,14 @@ package web
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"github.com/iddqdeika/infomodel-service/definitions"
 	"github.com/iddqdeika/pim"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -74,7 +76,20 @@ func (ws *webService) getInfomodelByIdentifier(w http.ResponseWriter, req *http.
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
 	im := convertIM(g)
+
+	if getAccept(req) == "application/xml" {
+		data, err := xml.Marshal(im)
+		if err != nil {
+			w.Write([]byte("internal server error: " + err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(data)
+		return
+	}
+
 	data, err := json.Marshal(im)
 	if err != nil {
 		w.Write([]byte("internal server error: " + err.Error()))
@@ -102,4 +117,13 @@ func convertIM(g *pim.StructureGroup) *definitions.InfomodelDTO {
 		Features:   fs,
 	}
 	return im
+}
+
+func getAccept(r *http.Request) string {
+	for k, v := range r.Header {
+		if k == "Accept" {
+			return strings.Join(v, "")
+		}
+	}
+	return ""
 }
