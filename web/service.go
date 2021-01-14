@@ -53,7 +53,6 @@ func (ws *webService) Run() error {
 	http.HandleFunc(getInfomodelByIdentifierPath, ws.getInfomodelByIdentifier)
 
 	log.Println("http handler started on port: " + strconv.Itoa(ws.cfg.Port))
-	//return http.ListenAndServe(":"+strconv.Itoa(ws.cfg.Port), nil)
 	return http.ListenAndServe(":"+strconv.Itoa(ws.cfg.Port), nil)
 }
 

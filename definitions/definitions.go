@@ -22,13 +22,13 @@ type Config interface {
 }
 
 type JsonInfomodelDTO struct {
-	Identifier string                 `json:"identifier" xml:"identifier"`
-	Features   map[string]*FeatureDTO `json:"features" xml:"features"`
+	Identifier string                 `json:"identifier"`
+	Features   map[string]*FeatureDTO `json:"features"`
 }
 
 type XmlInfomodelDTO struct {
-	Identifier string       `json:"identifier" xml:"identifier"`
-	Features   []FeatureDTO `json:"features" xml:"features"`
+	Identifier string       `xml:"identifier"`
+	Features   []FeatureDTO `xml:"features"`
 }
 
 type FeatureDTO struct {
