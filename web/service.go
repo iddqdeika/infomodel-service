@@ -53,6 +53,7 @@ func (ws *webService) Run() error {
 	http.HandleFunc(getInfomodelByIdentifierPath, ws.getInfomodelByIdentifier)
 
 	log.Println("http handler started on port: " + strconv.Itoa(ws.cfg.Port))
+	//return http.ListenAndServe(":"+strconv.Itoa(ws.cfg.Port), nil)
 	return http.ListenAndServe(":"+strconv.Itoa(ws.cfg.Port), nil)
 }
 
@@ -77,9 +78,9 @@ func (ws *webService) getInfomodelByIdentifier(w http.ResponseWriter, req *http.
 		return
 	}
 
-	im := convertIM(g)
-
-	if getAccept(req) == "application/xml" {
+	switch getAcceptEncoding(req) {
+	case "application/xml":
+		im := xmlConvertInfomodel(g)
 		data, err := xml.Marshal(im)
 		if err != nil {
 			w.Write([]byte("internal server error: " + err.Error()))
@@ -88,19 +89,20 @@ func (ws *webService) getInfomodelByIdentifier(w http.ResponseWriter, req *http.
 		}
 		w.Write(data)
 		return
-	}
-
-	data, err := json.Marshal(im)
-	if err != nil {
-		w.Write([]byte("internal server error: " + err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
+	default:
+		im := jsonConvertInfomodel(g)
+		data, err := json.Marshal(im)
+		if err != nil {
+			w.Write([]byte("internal server error: " + err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(data)
 		return
 	}
-	w.Write(data)
-	return
 }
 
-func convertIM(g *pim.StructureGroup) *definitions.InfomodelDTO {
+func jsonConvertInfomodel(g *pim.StructureGroup) *definitions.JsonInfomodelDTO {
 	fs := make(map[string]*definitions.FeatureDTO)
 	for _, feature := range g.Features {
 		f := &definitions.FeatureDTO{
@@ -112,14 +114,33 @@ func convertIM(g *pim.StructureGroup) *definitions.InfomodelDTO {
 		}
 		fs[feature.Name] = f
 	}
-	im := &definitions.InfomodelDTO{
+	im := &definitions.JsonInfomodelDTO{
 		Identifier: g.Identifier,
 		Features:   fs,
 	}
 	return im
 }
 
-func getAccept(r *http.Request) string {
+func xmlConvertInfomodel(g *pim.StructureGroup) *definitions.XmlInfomodelDTO {
+	var arr []definitions.FeatureDTO
+	for _, feature := range g.Features {
+		f := definitions.FeatureDTO{
+			Name:         feature.Name,
+			DataType:     feature.DataType,
+			PresetValues: feature.PresetValues,
+			Mandatory:    feature.Mandatory,
+			Multivalued:  feature.Multivalued,
+		}
+		arr = append(arr, f)
+	}
+	im := &definitions.XmlInfomodelDTO{
+		Identifier: g.Identifier,
+		Features:   arr,
+	}
+	return im
+}
+
+func getAcceptEncoding(r *http.Request) string {
 	for k, v := range r.Header {
 		if k == "Accept" {
 			return strings.Join(v, "")
