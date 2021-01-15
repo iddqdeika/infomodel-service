@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/iddqdeika/infomodel-service/definitions"
-	"github.com/iddqdeika/pim"
 	"log"
 	"net/http"
 	"strconv"
+
+	"infomodel-service/definitions"
+
+	"github.com/iddqdeika/pim"
 )
 
 const (

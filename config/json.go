@@ -3,7 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/iddqdeika/infomodel-service/definitions"
+	"infomodel-service/definitions"
 	"io/ioutil"
 	"reflect"
 	"strconv"
