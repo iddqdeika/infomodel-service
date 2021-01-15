@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -77,7 +76,7 @@ func (ws *webService) getInfomodelByIdentifier(w http.ResponseWriter, req *http.
 		return
 	}
 
-	switch getAcceptEncoding(req) {
+	switch req.Header.Get("Accept") {
 	case "application/xml":
 		im := xmlConvertInfomodel(g)
 		data, err := xml.Marshal(im)
@@ -137,13 +136,4 @@ func xmlConvertInfomodel(g *pim.StructureGroup) *definitions.XmlInfomodelDTO {
 		Features:   arr,
 	}
 	return im
-}
-
-func getAcceptEncoding(r *http.Request) string {
-	for k, v := range r.Header {
-		if k == "Accept" {
-			return strings.Join(v, "")
-		}
-	}
-	return ""
 }
