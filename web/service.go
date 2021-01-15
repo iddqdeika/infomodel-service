@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"github.com/iddqdeika/infomodel-service/definitions"
 	"github.com/iddqdeika/pim"
@@ -74,18 +75,32 @@ func (ws *webService) getInfomodelByIdentifier(w http.ResponseWriter, req *http.
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	im := convertIM(g)
-	data, err := json.Marshal(im)
-	if err != nil {
-		w.Write([]byte("internal server error: " + err.Error()))
-		w.WriteHeader(http.StatusInternalServerError)
+
+	switch req.Header.Get("Accept") {
+	case "application/xml":
+		im := xmlConvertInfomodel(g)
+		data, err := xml.Marshal(im)
+		if err != nil {
+			w.Write([]byte("internal server error: " + err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(data)
+		return
+	default:
+		im := jsonConvertInfomodel(g)
+		data, err := json.Marshal(im)
+		if err != nil {
+			w.Write([]byte("internal server error: " + err.Error()))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(data)
 		return
 	}
-	w.Write(data)
-	return
 }
 
-func convertIM(g *pim.StructureGroup) *definitions.InfomodelDTO {
+func jsonConvertInfomodel(g *pim.StructureGroup) *definitions.JsonInfomodelDTO {
 	fs := make(map[string]*definitions.FeatureDTO)
 	for _, feature := range g.Features {
 		f := &definitions.FeatureDTO{
@@ -97,9 +112,28 @@ func convertIM(g *pim.StructureGroup) *definitions.InfomodelDTO {
 		}
 		fs[feature.Name] = f
 	}
-	im := &definitions.InfomodelDTO{
+	im := &definitions.JsonInfomodelDTO{
 		Identifier: g.Identifier,
 		Features:   fs,
+	}
+	return im
+}
+
+func xmlConvertInfomodel(g *pim.StructureGroup) *definitions.XmlInfomodelDTO {
+	var arr []definitions.FeatureDTO
+	for _, feature := range g.Features {
+		f := definitions.FeatureDTO{
+			Name:         feature.Name,
+			DataType:     feature.DataType,
+			PresetValues: feature.PresetValues,
+			Mandatory:    feature.Mandatory,
+			Multivalued:  feature.Multivalued,
+		}
+		arr = append(arr, f)
+	}
+	im := &definitions.XmlInfomodelDTO{
+		Identifier: g.Identifier,
+		Features:   arr,
 	}
 	return im
 }

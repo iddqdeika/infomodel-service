@@ -21,15 +21,20 @@ type Config interface {
 	Child(path string) Config
 }
 
-type InfomodelDTO struct {
+type JsonInfomodelDTO struct {
 	Identifier string                 `json:"identifier"`
 	Features   map[string]*FeatureDTO `json:"features"`
 }
 
+type XmlInfomodelDTO struct {
+	Identifier string       `xml:"identifier"`
+	Features   []FeatureDTO `xml:"features"`
+}
+
 type FeatureDTO struct {
-	Name         string   `json:"name"`
-	DataType     string   `json:"data_type"`
-	PresetValues []string `json:"preset_values"`
-	Mandatory    bool     `json:"mandatory"`
-	Multivalued  bool     `json:"multivalued"`
+	Name         string   `json:"name" xml:"name"`
+	DataType     string   `json:"data_type" xml:"data_type"`
+	PresetValues []string `json:"preset_values" xml:"preset_values"`
+	Mandatory    bool     `json:"mandatory" xml:"mandatory"`
+	Multivalued  bool     `json:"multivalued" xml:"multivalued"`
 }
