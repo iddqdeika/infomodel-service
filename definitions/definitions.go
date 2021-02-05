@@ -1,7 +1,9 @@
 package definitions
 
 import (
+	"context"
 	"github.com/iddqdeika/pim"
+	"github.com/iddqdeika/rrr/helpful"
 )
 
 type InfomodelProvider interface {
@@ -9,16 +11,13 @@ type InfomodelProvider interface {
 }
 
 type WebService interface {
-	Run() error
+	Run(ctx context.Context) error
 }
 
 // предоставляет конфигурации по данному пути
 // по умолчанию разделитель - точка
 type Config interface {
-	GetString(path string) (string, error)
-	GetInt(path string) (int, error)
-	GetArray(path string) ([]Config, error)
-	Child(path string) Config
+	helpful.Config
 }
 
 type JsonInfomodelDTO struct {

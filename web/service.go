@@ -1,6 +1,7 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -45,7 +46,7 @@ type webService struct {
 	ip  definitions.InfomodelProvider
 }
 
-func (ws *webService) Run() error {
+func (ws *webService) Run(ctx context.Context) error {
 	log.Println("http handler init")
 	//addr, err := nethelper.GetCurrentAddr(ws.cfg.Port)
 	//if err != nil {
@@ -54,7 +55,16 @@ func (ws *webService) Run() error {
 	http.HandleFunc(getInfomodelByIdentifierPath, ws.getInfomodelByIdentifier)
 
 	log.Println("http handler started on port: " + strconv.Itoa(ws.cfg.Port))
-	return http.ListenAndServe(":"+strconv.Itoa(ws.cfg.Port), nil)
+	ch := make(chan error)
+	go func() {
+		ch <- http.ListenAndServe(":"+strconv.Itoa(ws.cfg.Port), nil)
+	}()
+	select {
+	case <-ctx.Done():
+		return nil
+	case err := <-ch:
+		return err
+	}
 }
 
 func (ws *webService) getInfomodelByIdentifier(w http.ResponseWriter, req *http.Request) {

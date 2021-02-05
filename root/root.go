@@ -2,12 +2,15 @@ package root
 
 import (
 	"context"
-	"github.com/iddqdeika/rrr"
-	"infomodel-service/config"
+
 	"infomodel-service/definitions"
 	"infomodel-service/infomodelproviders/cached"
 	"infomodel-service/infomodelproviders/pim"
 	"infomodel-service/web"
+
+	"github.com/iddqdeika/reactivetools/misc"
+	"github.com/iddqdeika/rrr"
+	"github.com/iddqdeika/rrr/helpful"
 )
 
 func New() rrr.Root {
@@ -15,7 +18,8 @@ func New() rrr.Root {
 }
 
 type root struct {
-	ws definitions.WebService
+	infomodelService definitions.WebService
+	echoService      definitions.WebService
 }
 
 func (r *root) Register() []error {
@@ -26,7 +30,7 @@ func (r *root) Register() []error {
 		}
 	}
 
-	cfg, err := config.NewJsonCfg("cfg.json")
+	cfg, err := helpful.NewJsonCfg("cfg.json")
 	e(err)
 	if err != nil {
 		return errs
@@ -42,7 +46,12 @@ func (r *root) Register() []error {
 
 	ws, err := web.NewService(cfg.Child("web"), cip)
 	e(err)
-	r.ws = ws
+	r.infomodelService = ws
+
+	//echo service
+	es, err := misc.NewEchoService(cfg.Child("echo_service"), helpful.DefaultLogger)
+	e(err)
+	r.echoService = es
 
 	if len(errs) == 0 {
 		return nil
@@ -51,7 +60,7 @@ func (r *root) Register() []error {
 }
 
 func (r *root) Resolve(ctx context.Context) error {
-	return r.ws.Run()
+	return rrr.ComposeErrors("Resolce", rrr.RunServices(ctx, r.infomodelService, r.echoService)...)
 }
 
 func (r *root) Release() error {
